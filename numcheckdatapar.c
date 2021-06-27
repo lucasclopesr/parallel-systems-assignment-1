@@ -80,12 +80,12 @@ void check_num(long n, int ndigits)
 void *call_checknum(void *arguments){
   struct thread_args *args = (struct thread_args *)arguments;
   int min, max, ndigits;
-  min = (int) args->min;
-  max = (int) args->max;
+  min = args->min;
+  max = args->max;
   ndigits = (int) args->ndigits;
 
   int i;
-  // printf("[log] Calling checknum with interval [%d,%d]\n", min, max);
+  printf("[log] Calling checknum with interval [%d,%d]\n", min, max);
   for(i = min; i <= max; i++){
     check_num(i,ndigits);
   }
@@ -123,25 +123,29 @@ int main( int argc, char* argv[] ) {
 
     // Alterações para paralelização por domínio
     // Divide o domínio em 8 partes iguais e dispara uma thread para cada parte
-    // Exemplo: 1000
-    // Dispara threads:
-    // - 0 a 125
-    // - 126 a 250
-    // - 251 a 375
-    // - 376 a 500
-    // - 501 a 625
-    // - 626 a 750
-    // - 751 a 875
-    // - 876 a 1000
     
     int thread_count = 8;
     struct thread_args args[thread_count];
     pthread_t thread_handles[thread_count];
+    pthread_t odd_thread;
     pthread_mutex_init(&lock, NULL);
 
     int partition = (int) maxnum / thread_count;
+    printf("[log]: partition = %d\n", partition);
     int min, max;
 
+    int isOdd = maxnum % 2 != 0;
+
+    if (isOdd){
+      struct thread_args odd_args;
+      odd_args.min = partition * thread_count + 1;
+      odd_args.max = (int) maxnum;
+      odd_args.ndigits = ndigits;
+      printf("[log] Odd maxnum; min = %d max = %d\n", odd_args.min, odd_args.max);
+      pthread_create(&odd_thread, NULL, call_checknum, (void*) &odd_args);
+    }
+
+    // printf("[log]: maxnum = %d\n", maxnum);
     for (i = 0; i < thread_count; i++){
       min =  i * partition + 1;
       max = min + partition - 1;
@@ -161,8 +165,13 @@ int main( int argc, char* argv[] ) {
       pthread_create(&thread_handles[i], NULL, call_checknum, &args[i]);
     }
 
-    for (i = 0; i < thread_count; i++)
+    if (isOdd){
+      pthread_join(odd_thread, NULL);
+    }
+
+    for (i = 0; i < thread_count; i++){
       pthread_join(thread_handles[i], NULL);
+    }
 
     gettimeofday(&t2,NULL);
 
