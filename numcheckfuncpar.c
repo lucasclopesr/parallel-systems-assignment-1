@@ -44,7 +44,7 @@ struct thread_args {
  */
 void *check_pal(void *arguments) {
   struct thread_args *args = (struct thread_args *)arguments;
-  int i;
+  long i;
   long maxnum = args->maxnum; 
   int ndigits = args->ndigits;
   int pal;
@@ -75,7 +75,7 @@ void *check_pal(void *arguments) {
 
 void *check_rep(void *arguments) {
   struct thread_args *args = (struct thread_args *)arguments;
-  int i;
+  long i;
   long maxnum = args->maxnum; 
   int ndigits = args->ndigits;
   int rep;
@@ -106,7 +106,7 @@ void *check_rep(void *arguments) {
 
 void *check_sum(void *arguments) {
   struct thread_args *args = (struct thread_args *)arguments;
-  int i;
+  long i;
   long maxnum = args->maxnum; 
   int ndigits = args->ndigits;
   int sum;
@@ -137,7 +137,7 @@ void *check_sum(void *arguments) {
 
 void *check_dou(void *arguments) {
   struct thread_args *args = (struct thread_args *)arguments;
-  int i;
+  long i;
   long maxnum = args->maxnum; 
   int ndigits = args->ndigits;
   int dou;
@@ -166,7 +166,7 @@ void *check_dou(void *arguments) {
 
 void *check_fou(void *arguments) {
   struct thread_args *args = (struct thread_args *)arguments;
-  int i;
+  long i;
   long maxnum = args->maxnum; 
   int ndigits = args->ndigits;
   int fou;

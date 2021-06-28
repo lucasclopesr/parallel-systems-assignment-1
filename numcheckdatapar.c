@@ -30,11 +30,10 @@ long match_some_test = 0,
 
 
 // Structures needed for parallelization
-
 pthread_mutex_t lock;
 
 struct thread_args {
-  int min, max, ndigits;
+  long min, max, ndigits;
 };
 // END Structures needed for parallelization
 
@@ -79,13 +78,13 @@ void check_num(long n, int ndigits)
 
 void *call_checknum(void *arguments){
   struct thread_args *args = (struct thread_args *)arguments;
-  int min, max, ndigits;
+  long min, max, ndigits;
   min = args->min;
   max = args->max;
   ndigits = (int) args->ndigits;
 
-  int i;
-  printf("[log] Calling checknum with interval [%d,%d]\n", min, max);
+  long i;
+  // printf("[log] Calling checknum with interval [%d,%d]\n", min, max);
   for(i = min; i <= max; i++){
     check_num(i,ndigits);
   }
@@ -130,18 +129,18 @@ int main( int argc, char* argv[] ) {
     pthread_t odd_thread;
     pthread_mutex_init(&lock, NULL);
 
-    int partition = (int) maxnum / thread_count;
-    printf("[log]: partition = %d\n", partition);
-    int min, max;
+    long partition = (int) maxnum / thread_count;
+    // printf("[log]: partition = %d\n", partition);
+    long min, max;
 
     int isOdd = maxnum % 2 != 0;
 
     if (isOdd){
       struct thread_args odd_args;
       odd_args.min = partition * thread_count + 1;
-      odd_args.max = (int) maxnum;
+      odd_args.max = maxnum;
       odd_args.ndigits = ndigits;
-      printf("[log] Odd maxnum; min = %d max = %d\n", odd_args.min, odd_args.max);
+      // printf("[log] Odd maxnum; min = %d max = %d\n", odd_args.min, odd_args.max);
       pthread_create(&odd_thread, NULL, call_checknum, (void*) &odd_args);
     }
 
@@ -156,11 +155,9 @@ int main( int argc, char* argv[] ) {
         max = min + partition;
       }
 
-
       args[i].min = min;
       args[i].max = max;
-      args[i].ndigits = ndigits;
-
+        args[i].ndigits = ndigits;
 
       pthread_create(&thread_handles[i], NULL, call_checknum, &args[i]);
     }
